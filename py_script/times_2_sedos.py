@@ -314,7 +314,6 @@ times_data_df.loc[percent_param_mask, years_col] *= 100
 - flow_emis + commodity + comm_grp
 - flow_share + limit + commodity
 """
-#print(times_data_df[times_data_df['process'] == 'ind_automobile_boiler_hot_water_bio_1'])
 
 # prepare and create OEP data structure for SEDOS
 for index, row in times_data_df.iterrows():
@@ -384,8 +383,6 @@ for index, row in times_data_df.iterrows():
 
 # delete rows with 'conversion_factor_-', whIAT is from act_eff in commodity group issue
 times_data_df = times_data_df[times_data_df['SEDOS_Parameters'] != 'conversion_factor_-']
-
-print(times_data_df[times_data_df['process'] == 'ind_automobile_boiler_hot_water_bio_1'])
 
 # drop columns that aren't needed anymore for SEDOS_data and create SEDOS_data dataframe
 SEDOS_data = times_data_df.drop(

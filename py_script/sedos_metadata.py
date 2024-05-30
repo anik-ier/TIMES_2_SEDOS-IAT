@@ -74,7 +74,7 @@ for dict_key, dict_value in parameter_sheet.items():
     # filter out keys(parameters) before updating
     filter_dict_value = {key: value for key, value in dict_value.items() if key not in parameters_to_ignore}
     parameters_dict.update(filter_dict_value)
-
+print(parameters_dict)
 
 # mapping of process and description
 process_sheet = pd.read_excel(mapping_excel_path, 'SEDOS_process')
@@ -164,7 +164,7 @@ for process in csv_files:
                                     else:
                                         item['unit'] = parameters_dict[key]["TIMES_Unit"]
 
-                        item['isAbout'] = []
+                        item['isAbout'] = [json.loads(parameters_dict[key]["isAbout"])]
                         item['valueReference'] = []
                         fields.insert(-5, item)
                     # print(fields)
