@@ -1,0 +1,146 @@
+{
+  "name": "",
+  "title": "sedos_",
+  "id": "https://openenergy-platform.org/dataedit/view/model_draft/",
+  "description": "Dataset describes scalar techno-economic and scenario data of technology/process:",
+  "language": ["en-GB"],
+  "subject": [
+        {
+            "name": "Industry Sector",
+            "path": "http://openenergy-platform.org/ontology/oeo/OEO_00000227/"
+        },
+    {
+            "name": "Automobile",
+            "path": "http://openenergy-platform.org/ontology/oeo/OEO_00010275"
+        }
+  ],
+  "keywords": ["SEDOS","input_data", "AP7", "Industry", "Automobile", "oedatamodel-parameter"],
+  "publicationDate": null,
+  "context": {
+    "homepage": "https://sedos-project.github.io/.github/",
+    "documentation": "https://sedos-project.github.io/.github/",
+    "sourceCode": "https://github.com/sedos-project",
+    "contact": "ulrich.fahl@ier.uni-stuttgart.de",
+    "grantNo": null,
+    "fundingAgency": "Bundesministerium für Wirtschaft und Klimaschutz (BMWK)",
+    "fundingAgencyLogo": "https://en.wikipedia.org/wiki/Federal_Ministry_for_Economic_Affairs_and_Climate_Action#/media/File:BMWi_Logo_2021.svg",
+    "publisherLogo": null
+  },
+  "spatial": {
+    "location": "Germany",
+    "extent": "DE",
+    "resolution": "NUTS-0"
+  },
+  "temporal": {
+    "referenceDate": "2021",
+    "timeseries": [
+            {
+                "start": "2021-01-01",
+                "end": "2070-12-31",
+                "resolution": "yearly",
+                "alignment": null,
+                "aggregationType": null
+            }]
+  },
+  "sources": [
+    {
+      "title": "OEDatamodel-parameter",
+      "description": "Parameter data model for secondary input scalars and timeseries",
+      "path": "https://github.com/sedos-project/oedatamodel/tree/main/oedatamodel-parameter",
+      "licenses": [
+        {
+          "name": "CC0-1.0",
+          "title": "Creative Commons Zero v1.0 Universal",
+          "path": "https://creativecommons.org/publicdomain/zero/1.0/legalcode",
+          "instruction": "You are free: To Share, To Create, To Adapt",
+          "attribution": null
+        }
+      ]
+    },
+    {
+            "title": "TAM Industry Model",
+            "description": "TAM Industry is based on TIMES and focuses on German industry energy system",
+            "path": null,
+            "licenses": [
+                {
+                    "name": "Creative Commons Attribution 4.0 International",
+                    "title": "CC BY 4.0",
+                    "path": "https://creativecommons.org/licenses/by/4.0/",
+                    "instruction": null,
+                    "attribution": "@Energy Economics and Social Analysis(ESA), IER, University of Stuttgart"
+                }
+            ]
+    }
+  ],
+  "licenses": [
+        {
+          "name": "CC-BY-4.0",
+          "title": "Creative Commons Attribution 4.0 International",
+          "path": "https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1",
+          "instruction": "You are free to: Share- copy and redistribute the material in any medium or format for any purpose, even commercially. Adapt - remix, transform, and build upon the material for any purpose, even commercially.",
+          "attribution": null
+        }
+  ],
+  "contributors": [
+        {
+            "title": "Anik Islam",
+            "email": "md-anik.islam@ier.uni-stuttgart.de",
+            "date": null,
+            "object": "data and metadata for Automobile industry",
+            "comment": "Processed data and Metadata"
+        }
+  ],
+  "resources": [
+    {
+      "profile": "tabular-data-resource",
+      "name": "model_draft.",
+      "path": "https://openenergy-platform.org/dataedit/view/model_draft/",
+      "format": "PostgreSQL",
+      "encoding" : "UTF-8",
+      "schema": {
+        "fields": [
+          {"name": "id", "description": "Unique identifier", "type": "bigint", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "region", "description": "Country or regionx", "type": "text", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "year", "description": "Year", "type": "integer", "unit": "a", "isAbout": [], "valueReference": []},
+          {"name": "type", "description": "Type of process", "type": "text", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "bandwidth_type", "description": "Bandwidth Type", "type": "json", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "version", "description": "Version", "type": "text", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "method", "description": "Method", "type": "json", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "source", "description": "Source", "type": "json", "unit": null, "isAbout": [], "valueReference": []},
+          {"name": "comment", "description": "Comment", "type": "json", "unit": null, "isAbout": [], "valueReference": []}
+        ],
+        "primaryKey": ["id"],
+        "foreignKeys": []
+      },
+      "dialect": {
+        "delimiter": ";",
+        "decimalSeparator": "."
+      }
+    }
+  ],
+  "@id": null,
+  "@context": "https://raw.githubusercontent.com/OpenEnergyPlatform/oemetadata/develop/metadata/latest/context.json",
+  "review": {
+    "path": null,
+    "badge": null
+  },
+  "metaMetadata": {
+    "metadataVersion": "oemetadata_v1.5.1",
+    "metadataLicense": {
+      "name": "CC0-1.0",
+      "title": "Creative Commons Zero v1.0 Universal",
+      "path": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  },
+  "_comment": {
+    "metadata": "Metadata documentation and explanation (https://github.com/OpenEnergyPlatform/oemetadata)",
+    "dates": "Dates and time must follow the ISO8601 including time zone (YYYY-MM-DD or YYYY-MM-DDThh:mm:ss±hh)",
+    "units": "Use a space between numbers and units (100 m)",
+    "languages": "Languages must follow the IETF (BCP47) format (en-GB, en-US, de-DE)",
+    "licenses": "License name must follow the SPDX License List (https://spdx.org/licenses/)",
+    "review": "Following the OEP Data Review (https://github.com/OpenEnergyPlatform/data-preprocessing/blob/master/data-review/manual/review_manual.md)",
+    "null": "If not applicable use: null",
+    "todo": "If a value is not yet available, use: todo"
+  }
+}
+
