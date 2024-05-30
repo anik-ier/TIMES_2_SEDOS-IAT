@@ -33,10 +33,10 @@ def sedos_process_list(subsector_name):
     @param subsector_name: name of the industry sub-sector in SEDOS style, str, e.g. 'ind_automobile'
     @return: list of processes from the specified sub-sector
     """
-    SEDOS_process_ms = pd.read_excel(SEDOS_Modellstruktur_path, sheet_name='Process_Set')  # SEDOS_Modellstruktur
-    SEDOS_ind_automobile = SEDOS_process_ms[SEDOS_process_ms['process'].str.contains(subsector_name)]
-    SEDOS_ind_process_list = SEDOS_ind_automobile['process'].tolist()
-    return SEDOS_ind_process_list
+    sedos_process_ms = pd.read_excel(SEDOS_Modellstruktur_path, sheet_name='Process_Set')  # SEDOS_Modellstruktur
+    sedos_ind_subsector = sedos_process_ms[sedos_process_ms['process'].str.contains(subsector_name)]
+    sedos_ind_process_list = sedos_ind_subsector['process'].tolist()
+    return sedos_ind_process_list
 
 
 # csv files folder and create list
@@ -49,15 +49,18 @@ prepared_process_list = []
 for process_csv in csv_files:
     prepared_process, _ = os.path.splitext(process_csv)
     prepared_process_list.append(prepared_process)
-print(f"Number of process prepared, {len(prepared_process_list)}")
+print(f"Number of process prepared as data given, {len(prepared_process_list)}")
 # check, if all processes from SEDOS_Modellstruktur are prepared
 SEDOS_process_check_list = sedos_process_list('ind_automobile')  # | ind_paper | ind_source | ind_copper | ind_aluminum | ind_cement')
+print(f"Total process listed in SEDOS_Modellstruktur {len(SEDOS_process_check_list)}")
+not_found_process = 0
 for process_ms in SEDOS_process_check_list:
     if process_ms not in prepared_process_list:
         print(f"{process_ms}, is not found and processed")
+        not_found_process += 1
     else:
         pass
-
+print(f"Total number of process not found: {not_found_process}")
 # path of mapping data from TIMES to SEDOS
 mapping_excel_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/Mapping_TIMES_2_SEDOS_IAT.xlsx"
 #  mapping parameters details into dict
@@ -74,7 +77,6 @@ for dict_key, dict_value in parameter_sheet.items():
     # filter out keys(parameters) before updating
     filter_dict_value = {key: value for key, value in dict_value.items() if key not in parameters_to_ignore}
     parameters_dict.update(filter_dict_value)
-print(parameters_dict)
 
 # mapping of process and description
 process_sheet = pd.read_excel(mapping_excel_path, 'SEDOS_process')

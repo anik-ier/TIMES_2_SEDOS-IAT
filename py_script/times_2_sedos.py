@@ -177,7 +177,6 @@ times_data_df = pd.concat([pri_comm_df, times_data_df], ignore_index=True)
 # remove any value on rows when NCAP_BND is 0
 # get unique process from 'process' column
 new_process = times_data_df['process'][times_data_df['process'].str.endswith(('01', '02', '03', '15', '20'))].unique()
-
 for process in new_process:
     # columns to iterate, exclude mentioned columns
     col_to_check = times_data_df.columns.difference(['process', 'commodity', 'commodity_group', 'parameters', 'time_slice', 'limit'])
@@ -336,7 +335,7 @@ for index, row in times_data_df.iterrows():
             times_data_df.at[index, 'SEDOS_Parameters'] = (row['parameters'] + '_' + row['commodity_group'] + '_' +
                                                            row['commodity'])
         # emission commodity CO2 from combustion
-        elif 'emi_co2_f_ind' in row['commodity']:# and row['parameters'] == 'NCAP_BND':
+        elif 'emi_co2_f_ind' in row['commodity']:
             # create SEDOS parameter for emission
             times_data_df.at[index, 'SEDOS_Parameters'] = (row['parameters'] + '_' + row['commodity_group'] + '_'
                                                            + row['commodity'])
