@@ -25,6 +25,10 @@ metadata_output = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/metadata/"
 source_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/data_sources.xlsx"
 # SEDOS_Modellstruktur
 SEDOS_Modellstruktur_path = 'C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/SEDOS_Modellstruktur.xlsx'
+# csv files folder and create list
+csv_folder_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/csv/"
+# path of mapping data from TIMES to SEDOS
+mapping_excel_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/Mapping_TIMES_2_SEDOS_IAT.xlsx"
 
 
 # process listed in SEDOS_Modellstruktur
@@ -39,10 +43,8 @@ def sedos_process_list(subsector_name):
     return sedos_ind_process_list
 
 
-# csv files folder and create list
-csv_folder_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/csv/"
-csv_files = []
 # list of all csv files and list of process without .csv extension
+csv_files = []
 for file in os.listdir(csv_folder_path):
     csv_files.append(file)
 prepared_process_list = []
@@ -61,8 +63,7 @@ for process_ms in SEDOS_process_check_list:
     else:
         pass
 print(f"Total number of process not found: {not_found_process}")
-# path of mapping data from TIMES to SEDOS
-mapping_excel_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/Mapping_TIMES_2_SEDOS_IAT.xlsx"
+
 #  mapping parameters details into dict
 parameter_sheet = pd.read_excel(mapping_excel_path, sheet_name=['SEDOS_parameters_1_e', 'SEDOS_parameters_1_w', 'SEDOS_parameters_GW'])
 
@@ -137,7 +138,8 @@ for process in csv_files:
             for column in process_df.columns[3:]:  # iterate through columns of process from CSV
                 item = dict()
                 for key in parameters_dict:  # iterate through parameters dictionary
-                    if re.search(key, column):  # match key from parameters dict with column name from process CSV
+                    # if re.search(key, column):
+                    if column.statrswith(key): # match key from parameters dict with column name from process CSV
                         item["name"] = column
                         item["description"] = parameters_dict[key]["description"]
                         # print(parameters_dict[key]["description"])

@@ -8,7 +8,7 @@ pd.set_option('display.max_columns', 50)
 # paths of mapping data from TIMES to SEDOS
 mapping_excel_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/Mapping_TIMES_2_SEDOS_IAT.xlsx"
 source_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/data_sources.xlsx"  # data sources Excel file path
-times_data_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/ind_auto_sedos_20240530_v01.xlsx"  # path of TIMES data
+times_data_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/ind_auto_sedos_20240531.xlsx"  # path of TIMES data
 output_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/csv/"  # process CSV files output file path
 demand_output_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/scalar_demand/"  # demand CSV file output file path
 
@@ -225,6 +225,23 @@ times_data_df.loc[act_eff_rows.index, years_col] = 1 / times_data_df.loc[act_eff
 # rename ACT_EFF to conversion_factor
 times_data_df.loc[act_eff_rows.index, "parameters"] = 'conversion_factor'
 
+
+print(process_top_in_dict)
+# create a dict with process that has ACT_EFF without cmm_grp and input commodity only in top-in
+process_single_input = {key: list(value.keys())[0] for key, value in process_top_in_dict.items() if len(value) == 1}
+print(process_single_input)
+
+# replace - value in process that has ACT_EFF without cmm_grp and commodity only in top-in
+# most cases are process with one input with ACT_EFF
+for dict_key, dict_comm in process_single_input.items():
+    for proc_index, proc_row in times_data_df.iterrows():
+        if dict_key in proc_row['process'] and proc_row['parameters'] == "conversion_factor":
+            times_data_df.at[proc_index, 'commodity'] = dict_comm
+        else:
+            pass
+
+# print(times_data_df[times_data_df['process'] == "IATPRCCOA01"])
+
 # Rename Parameters columns data with 'SEDOS' parameter names
 # process with capacity in GW
 for process, value in mapping_GW.items():
@@ -269,12 +286,16 @@ for key, value in mapping_data['SEDOS_commodity_group'].items():
             #print(row['process'])
             times_data_df.at[index, 'commodity_group'] = value
 
+# print(times_data_df[times_data_df['process'] == "IATPRCGAS01"])
+
 # rename commodity group if given explicitly other than ACTGRP
 times_data_df['process'].replace(mapping_data['SEDOS_process'], inplace=True)
 times_data_df['commodity_group'].replace(mapping_data['SEDOS_commodity_group'], inplace=True)
 # rename commodity_group name, if there is commodity (fuel) in commodity_group; e.g. fossil fuel, FLO_EMISS
 times_data_df['commodity_group'].replace(mapping_data['SEDOS_commodity'], inplace=True)
 times_data_df['limit'].replace(mapping_data['SEDOS_limit'], inplace=True)
+
+#print(times_data_df[times_data_df['process'] == "ind_automobile_boiler_steam_gas_1"])
 
 # convert, if any datatype other than string into string
 times_data_df['process'] = times_data_df['process'].astype(str)
@@ -316,6 +337,9 @@ times_data_df.loc[percent_param_mask, years_col] *= 100
 
 # prepare and create OEP data structure for SEDOS
 for index, row in times_data_df.iterrows():
+    # check if there is any parameters with uppercase, which should not be
+    if any(char.isupper() for char in row['parameters']):
+        print(f"process: {row['process']}, Row {index} has uppercase in {row['parameters']}")
     if row['parameters'] == 'conversion_factor':
         # match index with condition and create SEDOS specific parameters for SEDOS_Parameters column
         times_data_df.at[index, 'SEDOS_Parameters'] = row['parameters'] + '_' + row['commodity']
