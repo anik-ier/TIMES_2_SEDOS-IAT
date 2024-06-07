@@ -139,7 +139,7 @@ for process in csv_files:
                 item = dict()
                 for key in parameters_dict:  # iterate through parameters dictionary
                     # if re.search(key, column):
-                    if column.statrswith(key): # match key from parameters dict with column name from process CSV
+                    if column.startswith(key): # match key from parameters dict with column name from process CSV
                         item["name"] = column
                         item["description"] = parameters_dict[key]["description"]
                         # print(parameters_dict[key]["description"])

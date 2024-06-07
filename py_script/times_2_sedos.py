@@ -8,9 +8,12 @@ pd.set_option('display.max_columns', 50)
 # paths of mapping data from TIMES to SEDOS
 mapping_excel_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/Mapping_TIMES_2_SEDOS_IAT.xlsx"
 source_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/data_sources.xlsx"  # data sources Excel file path
-times_data_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/ind_auto_sedos_20240531.xlsx"  # path of TIMES data
+times_data_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/ind_auto_sedos_20240606.xlsx"  # path of TIMES data
 output_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/csv/"  # process CSV files output file path
 demand_output_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/scalar_demand/"  # demand CSV file output file path
+source_output_path = 'C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/'
+# process and source mapping after preparation
+process_source_mapping_path = "C:/Users/ac141435/Desktop/TIMES_2_SEDOS-IAT/process_source_mapping.xlsx"
 
 # create mapping dictionary for TIMES to SEDOS naming contents
 mapping_data_xl = pd.ExcelFile(mapping_excel_path)
@@ -366,10 +369,15 @@ for index, row in times_data_df.iterrows():
             milestone_years = ['2021', '2024', '2027', '2030', '2035', '2040', '2045', '2050', '2060', '2070']
             # create global_emission value and replace numerical value,
             # 'global_emi' is new column to hold global_emission text, create new value, e.g. global_emi.CH4_commodity
+            # dict of SEDOS commodity equivalent of column name from global emission factors
+            glob_emi_comm = mapping_data.get('global_emission_column')
             if row['parameters'] == 'ef':
                 if times_data_df.loc[index, milestone_years].notnull().any():
+                    global_col = glob_emi_comm.get(row['commodity_group'])
+                    print(global_col)
                     # Create global_emission value and replace numerical value
-                    global_emi_value = 'global_emission_factors.' + row['commodity_group'] + '_' + row['commodity'][4:7]
+                    # global_emi_value = 'global_emission_factors.' + row['commodity_group']
+                    global_emi_value = 'global_emission_factors.' + global_col
                     times_data_df.loc[index, 'global_emi'] = global_emi_value
 
                     # Replace numerical values in milestone years with the global_emi value where they exist
@@ -400,7 +408,7 @@ for index, row in times_data_df.iterrows():
 
     elif 'exo' in row['commodity']:  # exo_demand data process
         times_data_df.loc[index, 'SEDOS_Parameters'] = row['commodity']
-        times_data_df.loc[index, 'process'] = 'ind_automobile_scalars'
+        times_data_df.loc[index, 'process'] = 'ind_scalars'
     else:
         times_data_df.at[index, 'SEDOS_Parameters'] = row['parameters']
 
@@ -416,6 +424,10 @@ SEDOS_data = SEDOS_data.set_index(['process'])  # set row index by process
 unq_process = SEDOS_data.index.unique()  # index of each process to create dataframe for each process
 process_df = []
 process_e_list = []  # empty list to store all process_df
+
+# empty list of process and process column
+process_column_list = []
+
 for process in unq_process:
     process_df = SEDOS_data.loc[SEDOS_data.index == process]  # extract all data related with specific process
     process_df = process_df.T  # transpose dataframe to match sedos_oep data structure
@@ -423,34 +435,42 @@ for process in unq_process:
     process_df = process_df.iloc[:-1]  # drop 'SEDOS_Parameters' row
     process_df.reset_index(drop=False, inplace=True)  # reset index that was somehow years after transposing
     process_df.rename(columns={'index': 'year'}, inplace=True)  # rename 'index' column as 'year' column
+    # list of process and columns for specific process
+    process_column_list.append({'process': process, 'columns': [column for column in process_df.columns if 'year' not in column]})
     # insert id, region and process name as 'type' columns at the beginning of dataframe
     process_df.insert(0, 'id', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  # need to be adjusted based on years*
     process_df.insert(1, 'region', 'DE')
     process_df.insert(3, 'type', process)
     # insert version, method, source and comment columns at the end of dataframe
     columns_oth = ['bandwidth_type', 'version', 'method', 'source', 'comment']
-    sources_col = pd.read_excel(mapping_excel_path, 'SEDOS_process')
+    sources_col = pd.read_excel(process_source_mapping_path, 'SEDOS_process')  # mapping_excel_path
     for idx, row in sources_col.iterrows():
         if row['SEDOS'] == process:  # match process name from source df
             process_df['bandwidth_type'] = "{}"
-            process_df['version'] = 'v1'
+            process_df['version'] = 'srd_range_draft'
             process_df['method'] = row['method']
             process_df['source'] = row['source']
             process_df['comment'] = row['comment']
+    # find index of 'bandwidth_type' column
+    bandwidth_index = process_df.columns.get_loc('bandwidth_type')
+    # insert 'wacc' column value before 'bandwidth_type'
+    process_df.insert(bandwidth_index, 'wacc', 'global_scalars.wacc')
     # check if there are any NaN value in dataframe
     # check nan value in each column
     nan_column = process_df.isna().any()
     column_with_nan = nan_column[nan_column].index.tolist()
     # print('columns with Nan values, process: ' f'{process}, ', 'columns:', column_with_nan)
     # check, if any process from SEDOS_Modellstruktur is missing
-
     # save each process as CSV into folder
     if 'scalars' in process:
         process_df.to_csv(demand_output_path + process + '.csv', index=False, sep=';')
     else:
         process_df.to_csv(output_path + process + '.csv', index=False, sep=';')  # to use ; as delimiter> sep=';'
 
-# print(process_df.columns)
-# print(process_df)
 
-
+# prepare an Excel for process and columns to work on method, source and comment
+process_column_df = pd.DataFrame(process_column_list)  # convert list into df
+process_column_df = process_column_df.explode('columns')  # to include all the columns under single column header
+process_column_df['method'], process_column_df['source'], process_column_df['comment'] = '', '', ''
+print(process_column_df)
+process_column_df.to_excel(source_output_path + 'process_source.xlsx', index=False)
